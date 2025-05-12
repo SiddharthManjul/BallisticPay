@@ -4,11 +4,14 @@ module ballistic_pay::pyth_price;
     use sui::coin::{Self, Coin};
     use sui::sui::SUI;
     use sui::event;
+    use sui::clock;
     use pyth::price;
+    use pyth::price_info::PriceInfoObject
     use pyth::price_feed::{Self, PriceFeed};
     use pyth::price_identifier::{Self};
     use pyth::i64::{Self};
     use pyth::pyth;
+    use pyth::state;
 
     // Error codes
     const EInsufficientBalance: u64 = 0;
@@ -63,9 +66,11 @@ module ballistic_pay::pyth_price;
     // Get price from an updated Pyth price feed
     public fun get_price_from_feed(price_feed: &PriceFeed, ctx: &TxContext): u64 {
         let price = price_feed::get_price(price_feed);
+        let price_i64 = price::get_price(&price);
 
         // Assertion: Price must be valid & positive
-        
+        assert!(price::get_timestamp(&price) == tx_context::epoch_timestamp_ms(ctx), EPriceFeedNotUpdated);
+        assert!(!i64::get_is_negative(&price_i64), EPriceNegative);
 
         // Get the price value and exponent
         let price_value = i64::get_magnitude_if_positive(&price::get_price(&price));
@@ -94,5 +99,24 @@ module ballistic_pay::pyth_price;
         };
         
         price_in_usd
-    } 
+    }
+
+    public fun get_ballistic_pay_price_feed(pyth_state: &state::State, price_feed_id: vector<u8>, ctx: &TxContext): u64 {
+    // Convert byte vector to price identifier
+    let price_identifier = price_identifier::from_byte_vec(price_feed_id);
+    
+    // Get price feed from pyth state using the identifier
+    let price_feed_option = pyth::get_price_feed(pyth_state, price_identifier);
+    
+    // Ensure price feed exists
+    assert!(option::is_some(&price_feed_option), 1); // Error code 1 for invalid price feed
+    
+    // Extract the price feed
+    let price_feed = option::borrow(&price_feed_option);
+    
+    // Get price from the feed
+    let price = get_price_from_feed(price_feed, ctx);
+    
+    price
+}
 
