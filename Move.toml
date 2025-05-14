@@ -3,10 +3,10 @@ name = "BallisticPay"
 edition = "2024.beta"
 
 [dependencies]
-Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "devnet-v1.2.0" }
+Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/testnet" }
 SupraOracle = { local = "../supra-svalue-feed-framework" }
 
 [addresses]
+supra-svalue-feed-framework = "0x0"
 ballistic_pay = "0x1"
 sui = "0x2"
-sui_place = "0x3"

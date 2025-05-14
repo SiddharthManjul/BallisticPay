@@ -1,4 +1,1 @@
-module ballistic_pay::send_transaction {
-
-    
-}
+module ballistic_pay::send;
