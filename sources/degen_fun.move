@@ -51,3 +51,20 @@ public fun mint_to_sender(
 
     transfer::public_transfer(nft, sender)
 }
+
+public fun transfer(nft: FunglibleToken, recipient: address, _: &mut TxContext) {
+    transfer::public_transfer(nft, recipient)
+}
+
+public fun update_description(
+    nft: &mut FunglibleToken,
+    new_description: vector<u8>,
+    _: &mut TxContext,
+) {
+    nft.description = string::utf8(new_description);
+}
+
+public fun burn(nft: FunglibleToken, _: &mut TxContext) {
+    let FunglibleToken {id, name: _, description: _, url: _} = nft;
+    id.delete();
+}
