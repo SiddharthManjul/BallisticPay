@@ -1,12 +1,9 @@
 [package]
-name = "BallisticPay"
-edition = "2024.beta"
+name = "degen_fun"
+version = "0.0.1"
 
 [dependencies]
 Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/testnet" }
-SupraOracle = { local = "../supra-svalue-feed-framework" }
 
 [addresses]
-supra-svalue-feed-framework = "0x0"
-ballistic_pay = "0x1"
-sui = "0x2"
+degen_fun = "0x0"
