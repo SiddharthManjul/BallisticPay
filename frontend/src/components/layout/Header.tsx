@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { useWallet } from '../../context/WalletContext';
+import { WalletContext } from '../../context/WalletContext.tsx';
 
 const Header: React.FC = () => {
-  const { connected, address, connect, disconnect } = useWallet();
+  const { connected, address, connect, disconnect } = useContext(WalletContext);
 
   return (
     <header className="retro-navbar sticky top-0 z-50">

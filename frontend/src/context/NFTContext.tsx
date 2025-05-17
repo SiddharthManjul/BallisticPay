@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState } from 'react';
+import type { ReactNode } from 'react';
 import WalrusService from '../services/walrusService';
-import { useWallet } from './WalletContext';
+import { WalletContext } from './WalletContext.tsx';
 
 // NFT interface
 export interface NFT {
@@ -12,7 +13,7 @@ export interface NFT {
   creator: string;
   price?: string;
   listed: boolean;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   blobId: string;
 }
 
@@ -22,7 +23,7 @@ interface NFTContextType {
   userNFTs: NFT[];
   listedNFTs: NFT[];
   loadingNFTs: boolean;
-  createNFT: (name: string, description: string, imageFile: File, attributes: Record<string, any>) => Promise<NFT>;
+  createNFT: (name: string, description: string, imageFile: File, attributes: Record<string, unknown>) => Promise<NFT>;
   listNFT: (nftId: string, price: string) => Promise<boolean>;
   unlistNFT: (nftId: string) => Promise<boolean>;
   buyNFT: (nftId: string) => Promise<boolean>;
@@ -73,7 +74,7 @@ export const NFTProvider: React.FC<NFTProviderProps> = ({ children }) => {
   const [listedNFTs, setListedNFTs] = useState<NFT[]>([]);
   const [loadingNFTs, setLoadingNFTs] = useState<boolean>(false);
   
-  const { connected, address, signAndExecuteTransaction } = useWallet();
+  const { connected, address, signAndExecuteTransaction } = useContext(WalletContext);
   const walrusService = new WalrusService();
 
   // Create a new NFT
@@ -81,7 +82,7 @@ export const NFTProvider: React.FC<NFTProviderProps> = ({ children }) => {
     name: string, 
     description: string, 
     imageFile: File, 
-    attributes: Record<string, any>
+    attributes: Record<string, unknown>
   ): Promise<NFT> => {
     if (!connected || !address) {
       throw new Error('Wallet not connected');
@@ -99,7 +100,7 @@ export const NFTProvider: React.FC<NFTProviderProps> = ({ children }) => {
         image: imageUrl,
         attributes: Object.entries(attributes).map(([trait_type, value]) => ({
           trait_type,
-          value
+          value: String(value)
         })),
         creator: address,
         created_at: new Date().toISOString()
@@ -126,7 +127,15 @@ export const NFTProvider: React.FC<NFTProviderProps> = ({ children }) => {
       };
 
       // Sign and execute transaction
-      const response = await signAndExecuteTransaction(transaction);
+      const response = await signAndExecuteTransaction(transaction) as {
+        effects: {
+          created: Array<{
+            reference: {
+              objectId: string;
+            };
+          }>;
+        };
+      };
       
       // Extract NFT ID from transaction response
       const nftId = response.effects.created[0].reference.objectId;

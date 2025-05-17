@@ -1,0 +1,196 @@
+/* Retro Theme CSS Variables */
+:root {
+  /* Color Palette - 8-bit inspired */
+  --retro-black: #0f0f0f;
+  --retro-dark-gray: #333333;
+  --retro-gray: #777777;
+  --retro-light-gray: #aaaaaa;
+  --retro-white: #f8f8f8;
+  
+  --retro-primary: #ff6b6b;      /* Red-ish */
+  --retro-secondary: #4ecdc4;    /* Teal-ish */
+  --retro-accent: #ffe66d;       /* Yellow-ish */
+  --retro-success: #7bc950;      /* Green-ish */
+  --retro-warning: #ffbe0b;      /* Orange-ish */
+  --retro-error: #ff0054;        /* Bright Red */
+  
+  /* Typography */
+  --retro-font-pixel: 'Press Start 2P', 'VT323', monospace;
+  --retro-font-body: 'Courier New', monospace;
+  
+  /* Borders and Shadows */
+  --retro-border-width: 3px;
+  --retro-border-radius: 0px;    /* Sharp corners for pixel art feel */
+  --retro-box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.8);
+  
+  /* Spacing */
+  --retro-spacing-xs: 4px;
+  --retro-spacing-sm: 8px;
+  --retro-spacing-md: 16px;
+  --retro-spacing-lg: 24px;
+  --retro-spacing-xl: 32px;
+  
+  /* Animation */
+  --retro-transition-speed: 0.2s;
+}
+
+/* Global Styles */
+body {
+  font-family: var(--retro-font-body);
+  background-color: var(--retro-black);
+  color: var(--retro-white);
+  image-rendering: pixelated;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--retro-font-pixel);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Retro Button Styles */
+.retro-btn {
+  background-color: var(--retro-primary);
+  color: var(--retro-white);
+  border: var(--retro-border-width) solid var(--retro-white);
+  box-shadow: var(--retro-box-shadow);
+  padding: var(--retro-spacing-sm) var(--retro-spacing-md);
+  font-family: var(--retro-font-pixel);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--retro-transition-speed);
+}
+
+.retro-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.8);
+}
+
+.retro-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+}
+
+/* Retro Card Styles */
+.retro-card {
+  background-color: var(--retro-dark-gray);
+  border: var(--retro-border-width) solid var(--retro-white);
+  box-shadow: var(--retro-box-shadow);
+  padding: var(--retro-spacing-md);
+}
+
+/* Retro Input Styles */
+.retro-input {
+  background-color: var(--retro-black);
+  color: var(--retro-white);
+  border: var(--retro-border-width) solid var(--retro-white);
+  padding: var(--retro-spacing-sm);
+  font-family: var(--retro-font-body);
+}
+
+.retro-input:focus {
+  outline: none;
+  border-color: var(--retro-accent);
+}
+
+/* Retro Container */
+.retro-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--retro-spacing-md);
+}
+
+/* Retro Grid */
+.retro-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--retro-spacing-md);
+}
+
+/* Retro Navbar */
+.retro-navbar {
+  background-color: var(--retro-dark-gray);
+  border-bottom: var(--retro-border-width) solid var(--retro-white);
+  padding: var(--retro-spacing-sm) var(--retro-spacing-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Retro Footer */
+.retro-footer {
+  background-color: var(--retro-dark-gray);
+  border-top: var(--retro-border-width) solid var(--retro-white);
+  padding: var(--retro-spacing-md);
+  text-align: center;
+  margin-top: var(--retro-spacing-xl);
+}
+
+/* Pixel Art Border */
+.pixel-border {
+  position: relative;
+}
+
+.pixel-border::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: transparent;
+  border: 3px solid var(--retro-white);
+  pointer-events: none;
+  image-rendering: pixelated;
+}
+
+/* Responsive Utilities */
+@media (max-width: 768px) {
+  .retro-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+  }
+  
+  .retro-navbar {
+    flex-direction: column;
+    padding: var(--retro-spacing-sm);
+  }
+}
+
+/* Animation Keyframes */
+@keyframes pixel-fade {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.pixel-fade {
+  animation: pixel-fade 2s infinite;
+}
+
+/* Scanlines effect for CRT feel */
+.scanlines {
+  position: relative;
+  overflow: hidden;
+}
+
+.scanlines::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 0, 0, 0.1) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 10;
+}

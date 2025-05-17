@@ -1,4 +1,25 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
+
+// Define types for Sui wallet
+interface SuiAccount {
+  address: string;
+  publicKey?: string;
+}
+
+interface SuiWallet {
+  hasPermissions: () => Promise<boolean>;
+  getAccounts: () => Promise<{ connected: boolean; accounts: SuiAccount[] }>;
+  requestPermissions: () => Promise<{ connected: boolean; accounts: SuiAccount[] }>;
+  signAndExecuteTransaction: (options: { transaction: unknown }) => Promise<unknown>;
+  // Add other wallet methods you might use
+}
+
+declare global {
+  interface Window {
+    suiWallet?: SuiWallet;
+  }
+}
 
 // Define wallet provider interface
 interface WalletProviderProps {
@@ -12,7 +33,7 @@ interface WalletContextType {
   address: string | null;
   connect: () => Promise<void>;
   disconnect: () => void;
-  signAndExecuteTransaction: (transaction: any) => Promise<any>;
+  signAndExecuteTransaction: (transaction: unknown) => Promise<unknown>;
 }
 
 // Create wallet context with default values
@@ -25,23 +46,22 @@ const WalletContext = createContext<WalletContextType>({
   signAndExecuteTransaction: async () => ({}),
 });
 
-// Hook to use wallet context
-export const useWallet = () => useContext(WalletContext);
+// Export WalletContext for the hook
+export { WalletContext };
 
 // Wallet provider component
 export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const [connected, setConnected] = useState<boolean>(false);
   const [connecting, setConnecting] = useState<boolean>(false);
   const [address, setAddress] = useState<string | null>(null);
-  const [provider, setProvider] = useState<unknown>(null);
+  const [provider, setProvider] = useState<SuiWallet | null>(null);
 
   // Check if wallet is already connected on component mount
   useEffect(() => {
     const checkConnection = async () => {
       try {
-        // Check if window.suiWallet exists (browser extension)
-        if (typeof window !== 'undefined' && 'suiWallet' in window) {
-          const wallet = (window as any).suiWallet;
+        if (typeof window !== 'undefined' && window.suiWallet) {
+          const wallet = window.suiWallet;
           
           // Check if already connected
           const { connected, accounts } = await wallet.getAccounts();
@@ -65,9 +85,8 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     try {
       setConnecting(true);
       
-      // Check if wallet extension exists
-      if (typeof window !== 'undefined' && 'suiWallet' in window) {
-        const wallet = (window as any).suiWallet;
+      if (typeof window !== 'undefined' && window.suiWallet) {
+        const wallet = window.suiWallet;
         
         // Request connection
         const { connected, accounts } = await wallet.requestPermissions();
@@ -78,7 +97,6 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
           setProvider(wallet);
         }
       } else {
-        // Wallet extension not found
         alert('Sui wallet extension not found. Please install it to continue.');
       }
     } catch (error) {
@@ -97,17 +115,15 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   };
 
   // Sign and execute transaction function
-  const signAndExecuteTransaction = async (transaction: any) => {
+  const signAndExecuteTransaction = async (transaction: unknown) => {
     if (!connected || !provider) {
       throw new Error('Wallet not connected');
     }
 
     try {
-      // Sign and execute the transaction
       const response = await provider.signAndExecuteTransaction({
         transaction,
       });
-
       return response;
     } catch (error) {
       console.error('Error executing transaction:', error);
